@@ -1,0 +1,17 @@
+image:
+  pullPolicy: Always
+
+ingress:
+  hosts:
+    - host: api.chainstatus.org
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: cloudflare-tls
+      hosts:
+        - api.chainstatus.org
+
+parameters:
+  ENVIRONMENT: production
+  PORT: 80

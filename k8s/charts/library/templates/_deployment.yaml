@@ -1,0 +1,98 @@
+{{- define "library.deployment.tpl" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+          {{- if not .Values.ports }}
+          - name: http
+            containerPort: 80
+            protocol: TCP
+          {{- else }}
+          {{- range $key, $val := index .Values.ports }}
+          - name: {{ $val.name }}
+            containerPort: {{ $val.containerPort }}
+            protocol: {{ $val.protocol }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.livenessProbe }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbe.path }}
+              port: http
+          {{- end }}
+          {{- if .Values.readinessProbe }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.readinessProbe.path }}
+              port: http
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- if .Values.parameters }}
+              {{- range $key, $val := index .Values.parameters }}
+              - name: {{ $key }}
+                value: "{{ $val }}"
+              {{- end }}
+              {{- end }}
+              {{- if .Values.secrets }}
+              {{- range $key, $val := index .Values.secrets }}
+              - name: {{ $key }}
+                valueFrom:
+                  secretKeyRef:
+                    name: bonbonus
+                    key: {{ $val }}
+              {{- end }}
+              {{- end }}
+          {{- if .Values.mountSecrets }}
+          volumeMounts:
+          {{- range .Values.mountSecrets }}
+          - name: {{ .name }}
+            mountPath: {{ .path }}
+            readOnly: true
+          {{- end }}
+          {{- end }}
+      {{- if .Values.mountSecrets }}
+      volumes:
+      {{- range .Values.mountSecrets }}
+      - name: {{ .name }}
+        secret:
+          secretName: {{ .name }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- end -}}
