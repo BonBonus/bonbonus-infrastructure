@@ -14,6 +14,7 @@ deployService() {
 upgradeDev() {
   TRIGGER_ACTION="LOCAL-UPGRADE-AT-$(date +%s)"
   deployService bonbonus-ml-service dev "$TRIGGER_ACTION"
+  deployService bonbonus-render-service dev "$TRIGGER_ACTION"
   deployService bonbonus-backend-service dev "$TRIGGER_ACTION"
 }
 

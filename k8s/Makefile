@@ -30,4 +30,5 @@ upgrade-dev:
 ## Updates Helm charts' dependencies
 update-charts:
 	helm dependency update charts/bonbonus-ml-service
+	helm dependency update charts/bonbonus-render-service
 	helm dependency update charts/bonbonus-backend-service
