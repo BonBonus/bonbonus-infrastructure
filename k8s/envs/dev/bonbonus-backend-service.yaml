@@ -1,3 +1,5 @@
+replicaCount: 1
+
 image:
   pullPolicy: Always
 
@@ -15,3 +17,7 @@ ingress:
 parameters:
   ENVIRONMENT: production
   PORT: 80
+  CHAINLINK_ORACLE_API_KEY: 2cfr34VGcZ6R9ep9MnI0
+  MORALIS_API_KEY: OGqKjTlLKLbFRgO4FkrKk9PpuncN7WjwHYXgEtkaubJmQQ2XoqTq6gLFfAO4P2oc
+  BONBONUS_CONTRACT_ADDRESS: 0x5d388Aa431271a76d824DB4eddbE996C321F3887
+  RPC_URL: https://aged-flashy-dream.bsc-testnet.discover.quiknode.pro/6a3a33e6439e6c74d92f15c89fadc3dfd43999e0/
